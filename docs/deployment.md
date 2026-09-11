@@ -86,7 +86,7 @@ gunicorn -k gthread -w 1 --threads ${GUNICORN_THREADS:-4} ...
 在希望部署的目录执行。脚本内嵌 `docker-compose.yml`，不会下载项目源码或要求手工创建配置文件；脚本会在当前目录生成 Compose 配置、`.env` 和 `data` 目录：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email/refs/heads/main/scripts/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email-scripts/refs/heads/main/install.sh)
 ```
 
 root 用户直接运行即可；非 root 用户脚本会按需调用 `sudo`。如果使用仓库内的脚本文件，也可以执行 `bash scripts/install.sh`。需要指定其他部署目录时使用 `--install-dir PATH`（`--project-dir` 仍兼容）。默认使用 `lsh-okok/ok-email:latest`、容器名 `outlook-mail-reader` 和宿主端口 `5000`；命令末尾增加 `--v 3.6` 即部署 `lsh-okok/ok-email:3.6`，增加 `--n test-mail` 可自定义容器名，增加 `--p 5001` 可指定宿主端口。
@@ -109,6 +109,8 @@ docker compose -f docker-compose.yml up -d
 ## 分布式只读副本
 
 这套副本复制协议不依赖 Nginx Proxy Manager。主节点默认仍按现有方式运行；副本节点只需要单独指定 `NODE_ROLE=replica`、`MASTER_URL` 和本地独立的 `SECRET_KEY`。
+
+> 注意：`install-node.sh` 尚未发布到公开脚本仓库，下面的命令暂时不可用。当前请先按上一节的方式部署主节点，副本脚本补全后再同步更新。
 
 副本的首次安装可以直接在空目录执行：
 
@@ -146,7 +148,9 @@ bash scripts/install-node.sh --master https://PRIMARY_HOST --node-id NODE_ID --m
 
 ## Nginx Proxy Manager 一键安装
 
-如果希望由 Nginx Proxy Manager（NPM）提供唯一公网入口，请在一个独立的部署目录执行：
+如果希望由 Nginx Proxy Manager（NPM）提供唯一公网入口，请在一个独立的部署目录执行。
+
+> 注意：`install-with-npm.sh` 尚未发布到公开脚本仓库，下面的命令暂时不可用。需要公网入口时请先按上一节部署，再自行配置反向代理指向 `outlook-mail-reader:5000`。
 
 ```bash
 mkdir outlook-email-npm
