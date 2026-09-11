@@ -3533,6 +3533,9 @@ def fetch_account_folder_emails(account: Dict[str, Any], folder: str, skip: int,
     }
 
 
+RECIPIENT_SEARCH_FETCH_SIZE = 25
+
+
 def fetch_account_graph_emails_by_recipient(
     account: Dict[str, Any],
     folder: str,
@@ -3561,7 +3564,7 @@ def fetch_account_graph_emails_by_recipient(
         refresh_token,
         folder_name,
         recipient,
-        limit,
+        max(int(limit or 1), RECIPIENT_SEARCH_FETCH_SIZE),
         get_account_proxy_url(account),
         get_account_proxy_failover_urls(account),
     )

@@ -1520,6 +1520,7 @@ PUBLIC_MAILBOX_DELIVERY_HEADER_NAMES = {
     'received-spf',
     'authentication-results-original',
     'return-path',
+    'x-icloud-hme',
 }
 PUBLIC_MAILBOX_HTML_CSP = (
     "sandbox; default-src 'none'; img-src data:; style-src 'unsafe-inline'"
@@ -1615,7 +1616,10 @@ def public_mailbox_delivery_header_value_matches(value: Any, encoded_recipient: 
     if not encoded:
         return False
     text = str(value or '').lower()
-    pattern = rf'(?<![a-z0-9.%+=]){re.escape(encoded)}(?![a-z0-9.%+=])'
+    if '@' in encoded:
+        pattern = rf'(?<![a-z0-9._%+-]){re.escape(encoded)}(?![a-z0-9.@-])'
+    else:
+        pattern = rf'(?<![a-z0-9.%+=]){re.escape(encoded)}(?![a-z0-9.%+=])'
     return re.search(pattern, text) is not None
 
 
@@ -1623,9 +1627,14 @@ def public_mailbox_delivery_headers_match(detail: Dict[str, Any], target_email: 
     encoded_recipient = public_mailbox_encoded_delivery_recipient(target_email)
     if not encoded_recipient:
         return True
+    candidates = [encoded_recipient]
+    plain_recipient = normalize_email_address(target_email)
+    if plain_recipient and plain_recipient != encoded_recipient:
+        candidates.append(plain_recipient)
     return any(
-        public_mailbox_delivery_header_value_matches(value, encoded_recipient)
+        public_mailbox_delivery_header_value_matches(value, candidate)
         for value in iter_public_mailbox_delivery_header_values(detail)
+        for candidate in candidates
     )
 
 
@@ -1805,9 +1814,6 @@ def find_public_mailbox_messages(
                 seen.add(key)
                 item['_request_method'] = 'graph'
                 matches.append(item)
-
-            if folder_name == 'inbox' and matches:
-                break
 
         if matches:
             should_scan = False

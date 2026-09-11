@@ -487,9 +487,85 @@ class PublicMailboxMessageSearchTests(unittest.TestCase):
         self.assertTrue(result['success'])
         self.assertEqual(result['count'], 1)
         self.assertEqual(result['messages'][0]['body'], '<p>fast body</p>')
-        graph_search_mock.assert_called_once_with(account, 'inbox', 'target@example.com', 1)
+        self.assertEqual(graph_search_mock.call_count, 3)
+        graph_search_mock.assert_any_call(account, 'inbox', 'target@example.com', 1)
         scan_mock.assert_not_called()
         detail_mock.assert_not_called()
+
+    def test_outlook_graph_recipient_search_picks_newest_across_folders(self):
+        account = {
+            **self.account,
+            'client_id': 'client-id',
+            'refresh_token': 'refresh-token',
+        }
+        older_inbox = {
+            **self.item('inbox-older', 'target@example.com', '2026-08-21T10:00:00Z'),
+            '_detail': {
+                'id': 'inbox-older',
+                'subject': 'Older',
+                'from': 'sender@example.com',
+                'to': 'target@example.com',
+                'date': '2026-08-21T10:00:00Z',
+                'body': '<p>older</p>',
+                'body_type': 'html',
+            },
+        }
+        newer_junk = {
+            **self.item('junk-newer', 'target@example.com', '2026-08-21T12:00:00Z'),
+            'folder': 'junkemail',
+            '_detail': {
+                'id': 'junk-newer',
+                'subject': 'Newer',
+                'from': 'sender@example.com',
+                'to': 'target@example.com',
+                'date': '2026-08-21T12:00:00Z',
+                'body': '<p>newer</p>',
+                'body_type': 'html',
+            },
+        }
+
+        def graph_search_side_effect(_account, folder, _recipient, _limit):
+            if folder == 'inbox':
+                return {
+                    'success': True,
+                    'emails': [older_inbox],
+                    'recipient_search_supported': True,
+                    'request_method': 'graph',
+                }
+            if folder == 'junkemail':
+                return {
+                    'success': True,
+                    'emails': [newer_junk],
+                    'recipient_search_supported': True,
+                    'request_method': 'graph',
+                }
+            return {
+                'success': True,
+                'emails': [],
+                'recipient_search_supported': True,
+                'request_method': 'graph',
+            }
+
+        with patch.object(
+            web_outlook_app,
+            'fetch_account_graph_emails_by_recipient',
+            side_effect=graph_search_side_effect,
+        ), patch.object(
+            web_outlook_app,
+            'fetch_email_detail_for_account',
+            side_effect=lambda _account, message_id, *_args, **_kwargs: self.detail(
+                {'id': message_id, 'to': 'target@example.com'}
+            ),
+        ):
+            result = web_outlook_app.find_public_mailbox_messages(
+                account,
+                'target@example.com',
+                1,
+            )
+
+        self.assertTrue(result['success'])
+        self.assertEqual(result['count'], 1)
+        self.assertEqual(result['messages'][0]['subject'], 'Newer')
 
     def test_outlook_graph_recipient_search_no_match_falls_back_to_limited_scan(self):
         account = {
