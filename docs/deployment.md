@@ -95,6 +95,22 @@ root 用户直接运行即可；非 root 用户脚本会按需调用 `sudo`。�
 
 默认宿主端口为 `5000`。如果端口已被占用，脚本会要求输入 `1024-65535` 范围内的可用端口；也可以通过 `--p PORT` 显式指定端口。显式指定的端口无效或已被占用时脚本会直接失败，不会等待交互输入；容器内部端口始终为 `5000`。
 
+### 私有镜像：先登录再拉取
+
+镜像可能处于私有状态，此时匿名拉取会报 `pull access denied`。传入 registry 凭据让脚本自动 `docker login`：
+
+```bash
+# GHCR：用户名是 GitHub 用户名，密码填带 read:packages 权限的 PAT（会交互式询问）
+bash <(curl -fsSL .../install.sh) --registry ghcr --registry-username <github-user>
+
+# 非交互场景用环境变量传 PAT，避免出现在命令行历史里
+export OK_EMAIL_REGISTRY_USERNAME=<github-user>
+export OK_EMAIL_REGISTRY_PASSWORD=ghp_xxx
+bash <(curl -fsSL .../install.sh) --registry ghcr
+```
+
+`--registry-password` 也可显式给出。脚本会根据镜像引用自动判断 registry 主机名（支持带端口的私有仓库），只在提供了用户名时才登录。未显式指定 `--registry` / `--image` 时，若默认 registry 拉取失败，脚本会自动换到另一个官方 registry 再试一次。
+
 每次运行都会执行：
 
 ```bash
@@ -333,12 +349,14 @@ GitHub Actions 会同时发布到 Docker Hub 和 GitHub Container Registry（GHC
 
 GHCR 使用工作流内置的 `GITHUB_TOKEN`，无需额外配置；仓库的 `packages: write` 权限已在 `docker-build-push.yml` 中声明。
 
-同一套标签会推到两个 registry：
+**`DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` 是可选的。** 未配置时工作流会跳过 Docker Hub 登录，只推送 GHCR，不会因为缺 secret 而整个失败（也不会连带把 GHCR 那一路拖垮）。
 
-- Docker Hub: `lsh-okok/ok-email:<tag>`
-- GHCR: `ghcr.io/lsh-okok/ok-email:<tag>`
+发布目标：
 
-一键安装脚本默认使用 Docker Hub；需要走 GHCR 时加上 `--registry ghcr`。
+- GHCR: `ghcr.io/lsh-okok/ok-email:<tag>` —— 始终推送
+- Docker Hub: `lsh-okok/ok-email:<tag>` —— 仅当配置了上述两个 secret 时推送
+
+一键安装脚本默认使用 Docker Hub；需要走 GHCR 时加上 `--registry ghcr`。镜像为私有时配合 `--registry-username` / `--registry-password` 先登录。
 
 补充说明：
 
