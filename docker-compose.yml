@@ -1,6 +1,6 @@
 services:
   outlook-mail-reader:
-    image: seldomzq/email:latest
+    image: lsh-okok/ok-email:latest
     container_name: outlook-mail-reader
     ports:
       - "${OUTLOOK_EMAIL_PORT:-5000}:5000"

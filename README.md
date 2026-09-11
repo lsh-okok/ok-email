@@ -45,7 +45,7 @@
 
 ```bash
 # 拉取最新镜像
-docker pull ghcr.io/lemon-casino/email:latest
+docker pull lsh-okok/ok-email:latest
 
 # 运行容器
 docker run -d \
@@ -54,13 +54,13 @@ docker run -d \
   -v $(pwd)/data:/app/data \
   -e LOGIN_PASSWORD=admin123 \
   -e SECRET_KEY=your-secret-key-here \
-  ghcr.io/lemon-casino/email:latest
+  lsh-okok/ok-email:latest
 ```
 
 ### 方式四：使用 Python 直接运行
 
 ```bash
-git clone https://github.com/assast/outlookEmail.git
+git clone https://github.com/lsh-okok/ok-email.git
 cd outlookEmail
 pip install -r requirements.txt
 export SECRET_KEY=your-secret-key-here
@@ -80,7 +80,7 @@ python web_outlook_app.py
 version: '3.8'
 services:
   outlook-mail-reader:
-    image: ghcr.io/lemon-casino/email:latest
+    image: lsh-okok/ok-email:latest
     container_name: outlook-mail-reader
     ports:
       - "5000:5000"
@@ -112,7 +112,7 @@ docker-compose up -d
 version: '3.8'
 services:
   outlook-mail-reader:
-    image: ghcr.io/lemon-casino/email:latest
+    image: lsh-okok/ok-email:latest
     container_name: outlook-mail-reader
     ports:
       - "5000:5000"
@@ -608,7 +608,7 @@ https://support.google.com/mail/answer/185833?hl=zh-Hans
 欢迎提交 Issue 和 Pull Request！
 
 ```bash
-git clone https://github.com/assast/outlookEmail.git
+git clone https://github.com/lsh-okok/ok-email.git
 cd outlookEmail
 python -m venv venv
 source venv/bin/activate
@@ -629,7 +629,7 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=assast/outlookEmail&type=Date)](https://star-history.com/#assast/outlookEmail&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=lsh-okok/ok-email&type=Date)](https://star-history.com/#lsh-okok/ok-email&Date)
 
 ---
 

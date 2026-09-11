@@ -599,7 +599,7 @@
         if (!githubLink) {
             githubLink = document.createElement('a');
             githubLink.className = 'github-link';
-            githubLink.href = 'https://github.com/assast/outlookEmail';
+            githubLink.href = 'https://github.com/lsh-okok/ok-email';
             githubLink.target = '_blank';
             githubLink.rel = 'noopener noreferrer';
             githubLink.setAttribute('aria-label', 'GitHub 仓库');
