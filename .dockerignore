@@ -28,6 +28,11 @@ ENV/
 *.sqlite
 *.sqlite3
 
+# 本地凭据（切勿打进镜像）
+.env
+.env.*
+!.env.example
+
 # 日志
 *.log
 
