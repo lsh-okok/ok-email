@@ -90,7 +90,7 @@ if sys.platform == "darwin":
         coll,
         name="OutlookEmail.app",
         icon=None,
-        bundle_identifier="org.assast.outlookemail",
+        bundle_identifier="org.lsh-okok.ok-email",
         info_plist={
             "CFBundleName": "OutlookEmail",
             "CFBundleDisplayName": "OutlookEmail",

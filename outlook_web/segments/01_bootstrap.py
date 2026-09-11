@@ -221,8 +221,8 @@ try:
 except Exception:
     APP_VERSION = '1.0.0'
 
-REPOSITORY_OWNER = os.getenv('REPOSITORY_OWNER', 'assast')
-REPOSITORY_NAME = os.getenv('REPOSITORY_NAME', 'outlookEmail')
+REPOSITORY_OWNER = os.getenv('REPOSITORY_OWNER', 'lsh-okok')
+REPOSITORY_NAME = os.getenv('REPOSITORY_NAME', 'ok-email')
 CHANGELOG_URL = os.getenv(
     'CHANGELOG_URL',
     f'https://github.com/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/blob/main/CHANGELOG.md',

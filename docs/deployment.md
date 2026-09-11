@@ -20,7 +20,7 @@
 
 ```bash
 # 拉取最新镜像
-docker pull seldomzq/email:latest
+docker pull lsh-okok/ok-email:latest
 
 # 运行容器
 docker run -d \
@@ -29,7 +29,7 @@ docker run -d \
   -v $(pwd)/data:/app/data \
   -e LOGIN_PASSWORD=admin123 \
   -e SECRET_KEY=your-secret-key-here \
-  seldomzq/email:latest
+  lsh-okok/ok-email:latest
 
 # 查看日志
 docker logs -f outlook-mail-reader
@@ -49,7 +49,7 @@ docker rm outlook-mail-reader
 
 ```bash
 # 克隆仓库
-git clone https://github.com/assast/outlookEmail.git
+git clone https://github.com/lsh-okok/ok-email.git
 cd outlookEmail
 
 # 安装依赖
@@ -86,10 +86,10 @@ gunicorn -k gthread -w 1 --threads ${GUNICORN_THREADS:-4} ...
 在希望部署的目录执行。脚本内嵌 `docker-compose.yml`，不会下载项目源码或要求手工创建配置文件；脚本会在当前目录生成 Compose 配置、`.env` 和 `data` 目录：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/seldom1024/email-scripts/refs/heads/master/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email/refs/heads/main/scripts/install.sh)
 ```
 
-root 用户直接运行即可；非 root 用户脚本会按需调用 `sudo`。如果使用仓库内的脚本文件，也可以执行 `bash scripts/install.sh`。需要指定其他部署目录时使用 `--install-dir PATH`（`--project-dir` 仍兼容）。默认使用 `seldomzq/email:latest`、容器名 `outlook-mail-reader` 和宿主端口 `5000`；命令末尾增加 `--v 3.6` 即部署 `seldomzq/email:3.6`，增加 `--n test-mail` 可自定义容器名，增加 `--p 5001` 可指定宿主端口。
+root 用户直接运行即可；非 root 用户脚本会按需调用 `sudo`。如果使用仓库内的脚本文件，也可以执行 `bash scripts/install.sh`。需要指定其他部署目录时使用 `--install-dir PATH`（`--project-dir` 仍兼容）。默认使用 `lsh-okok/ok-email:latest`、容器名 `outlook-mail-reader` 和宿主端口 `5000`；命令末尾增加 `--v 3.6` 即部署 `lsh-okok/ok-email:3.6`，增加 `--n test-mail` 可自定义容器名，增加 `--p 5001` 可指定宿主端口。
 
 脚本首次运行会提示输入 `LOGIN_PASSWORD` 和 `SECRET_KEY`。直接回车会生成安全随机值，并将配置保存到 `.env`（权限 `600`）。已有非空值会在重复运行时复用，不会因为重新安装而更换 `SECRET_KEY`。
 
@@ -102,7 +102,7 @@ docker compose -f docker-compose.yml pull
 docker compose -f docker-compose.yml up -d
 ```
 
-即使本地已有 `seldomzq/email:latest`，也会检查 Docker Hub 的最新镜像。远程拉取失败时脚本会停止，不会静默使用旧本地镜像。脚本不会删除其他容器、镜像、数据目录或数据卷。
+即使本地已有 `lsh-okok/ok-email:latest`，也会检查 Docker Hub 的最新镜像。远程拉取失败时脚本会停止，不会静默使用旧本地镜像。脚本不会删除其他容器、镜像、数据目录或数据卷。
 
 安装完成后，脚本会输出访问 URL、容器名称、登录密码和 `SECRET_KEY`。升级时保留 `.env` 与 `./data`，再次执行同一脚本或运行上面的 Compose 命令即可。
 
@@ -116,7 +116,7 @@ docker compose -f docker-compose.yml up -d
 bash scripts/install-node.sh --master https://PRIMARY_HOST --node-id NODE_ID --master-fingerprint SHA256:...
 ```
 
-脚本会在当前目录生成 `docker-compose.yml`、`.env` 和 `data/cluster/identity.db`，并在重复运行时复用已有身份、重新拉取所选版本的 `seldomzq/email` 镜像。增加 `--v 3.6` 可部署 `seldomzq/email:3.6`，增加 `--n test-mail` 可自定义副本容器名，增加 `--p 5001` 可指定宿主端口，省略时分别使用 `latest`、`outlook-mail-reader` 和 `5000`。`LOGIN_PASSWORD` 不参与副本运行；`SECRET_KEY` 为空时会自动生成并保存。
+脚本会在当前目录生成 `docker-compose.yml`、`.env` 和 `data/cluster/identity.db`，并在重复运行时复用已有身份、重新拉取所选版本的 `lsh-okok/ok-email` 镜像。增加 `--v 3.6` 可部署 `lsh-okok/ok-email:3.6`，增加 `--n test-mail` 可自定义副本容器名，增加 `--p 5001` 可指定宿主端口，省略时分别使用 `latest`、`outlook-mail-reader` 和 `5000`。`LOGIN_PASSWORD` 不参与副本运行；`SECRET_KEY` 为空时会自动生成并保存。
 
 副本只同步 `/api/v1/mailboxes/messages` 所需的数据。公共 API Key 只保留鉴权与绑定所需的最小字段，不会同步可恢复密钥、名称或备注；因此副本列表页只应依赖摘要、后缀、绑定账号和过期信息。
 
@@ -151,10 +151,10 @@ bash scripts/install-node.sh --master https://PRIMARY_HOST --node-id NODE_ID --m
 ```bash
 mkdir outlook-email-npm
 cd outlook-email-npm
-bash <(curl -fsSL https://raw.githubusercontent.com/seldom1024/Email/refs/heads/feature/public-mailbox-messages/scripts/install-with-npm.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email/refs/heads/main/scripts/install-with-npm.sh)
 ```
 
-NPM 安装命令支持可选的 `--v VERSION` 和 `--n CONTAINER_NAME` 参数，例如 `--v 3.6 --n test-mail`；省略时分别使用 `seldomzq/email:latest` 和 `outlook-mail-reader`。自定义容器名后，Proxy Host 的 Forward Hostname / IP 也应填写该名称。
+NPM 安装命令支持可选的 `--v VERSION` 和 `--n CONTAINER_NAME` 参数，例如 `--v 3.6 --n test-mail`；省略时分别使用 `lsh-okok/ok-email:latest` 和 `outlook-mail-reader`。自定义容器名后，Proxy Host 的 Forward Hostname / IP 也应填写该名称。
 
 仓库内脚本也可直接运行：
 
@@ -210,7 +210,7 @@ Forward Port: 5000
 
 1. 拉取 `jc21/nginx-proxy-manager:latest`。
 2. 启动 NPM，并等待管理端口 `81` 可用。
-3. 拉取 `seldomzq/email:latest`。
+3. 拉取 `lsh-okok/ok-email:latest`。
 4. 启动 `outlook-mail-reader`，并从容器内部检查端口 `5000`。
 
 本地已有镜像时仍会拉取远程最新版本。任何镜像拉取失败都会停止，不会使用缓存旧镜像继续启动。邮件服务启动失败时，已经正常运行的 NPM 会保留，脚本不会执行破坏性回滚。
@@ -232,7 +232,7 @@ version: '3.8'
 
 services:
   outlook-mail-reader:
-    image: seldomzq/email:latest
+    image: lsh-okok/ok-email:latest
     container_name: outlook-mail-reader
     ports:
       - "5000:5000"
@@ -317,15 +317,24 @@ ports:
 
 ### 可用镜像标签
 
-- `seldomzq/email:latest` - 默认分支最近一次符合条件的稳定构建
-- `seldomzq/email:main` - `main` 分支最近一次符合条件的构建
-- `seldomzq/email:dev` - `dev` 分支最近一次符合条件的构建
-- `seldomzq/email:vX.Y.Z` - 指定正式版本镜像，由手动发版工作流生成
+- `lsh-okok/ok-email:latest` - 默认分支最近一次符合条件的稳定构建
+- `lsh-okok/ok-email:main` - `main` 分支最近一次符合条件的构建
+- `lsh-okok/ok-email:dev` - `dev` 分支最近一次符合条件的构建
+- `lsh-okok/ok-email:vX.Y.Z` - 指定正式版本镜像，由手动发版工作流生成
 
-GitHub Actions 发布到 Docker Hub 需要在仓库的 Actions secrets 中配置：
+GitHub Actions 会同时发布到 Docker Hub 和 GitHub Container Registry（GHCR）。需要在仓库的 Actions secrets 中配置：
 
-- `DOCKERHUB_USERNAME`: `seldomzq`
+- `DOCKERHUB_USERNAME`: `lsh-okok`
 - `DOCKERHUB_TOKEN`: Docker Hub Access Token（不要填写账户密码）
+
+GHCR 使用工作流内置的 `GITHUB_TOKEN`，无需额外配置；仓库的 `packages: write` 权限已在 `docker-build-push.yml` 中声明。
+
+同一套标签会推到两个 registry：
+
+- Docker Hub: `lsh-okok/ok-email:<tag>`
+- GHCR: `ghcr.io/lsh-okok/ok-email:<tag>`
+
+一键安装脚本默认使用 Docker Hub；需要走 GHCR 时加上 `--registry ghcr`。
 
 补充说明：
 
@@ -336,7 +345,7 @@ GitHub Actions 发布到 Docker Hub 需要在仓库的 Actions secrets 中配置
 ### 更新镜像
 
 ```bash
-docker pull seldomzq/email:latest
+docker pull lsh-okok/ok-email:latest
 docker-compose down
 docker-compose up -d
 ```
