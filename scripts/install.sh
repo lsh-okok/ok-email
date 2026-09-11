@@ -6,8 +6,8 @@
 # Plugin，生成 docker-compose.yml 与 .env，拉取镜像并启动服务。
 #
 # 用法:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email/refs/heads/main/scripts/install.sh)
-#   bash scripts/install.sh [--v VERSION] [--n NAME] [--p PORT] [--install-dir PATH]
+#   bash <(curl -fsSL https://raw.githubusercontent.com/lsh-okok/ok-email-scripts/refs/heads/main/install.sh)
+#   bash install.sh [--v VERSION] [--n NAME] [--p PORT] [--install-dir PATH]
 #                           [--registry dockerhub|ghcr] [--image REPO:TAG]
 #                           [--yes] [--show-credentials]
 #
